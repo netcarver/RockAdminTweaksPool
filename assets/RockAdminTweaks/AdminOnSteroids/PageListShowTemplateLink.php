@@ -4,24 +4,30 @@ namespace RockAdminTweaks;
 
 use ProcessWire\HookEvent;
 
-class PageListShowTemplateLink extends Tweak {
-
-
-    public function info() {
+class PageListShowTemplateLink extends Tweak
+{
+    public function info()
+    {
         return [
             'description' => "Shows the template name and edit link in the page tree action list for SuperUsers",
         ];
     }
 
 
-    public function ready() {
-        if (!$this->wire->user->isSuperuser()) return;
-        if ($this->wire->page->template != 'admin') return;
+    public function ready()
+    {
+        if (!$this->wire->user->isSuperuser()) {
+            return;
+        }
+        if ($this->wire->page->template != 'admin') {
+            return;
+        }
         $this->wire->addHookAfter('ProcessPageListActions::getActions', $this, 'addAction');
     }
 
 
-    public function addAction(HookEvent $event) {
+    public function addAction(HookEvent $event)
+    {
         $page = $event->arguments('page');
         $actions = $event->return;
         $template = $page->template;
@@ -45,8 +51,11 @@ class PageListShowTemplateLink extends Tweak {
             $key_extras = count($actions);
         }
 
-        $actions = array_merge(array_slice($actions, 0, $key_extras, true), $editTemplateAction,
-            array_slice($actions, $key_extras, null, true));
+        $actions = array_merge(
+            array_slice($actions, 0, $key_extras, true),
+            $editTemplateAction,
+            array_slice($actions, $key_extras, null, true)
+        );
 
         $event->return = $actions;
     }

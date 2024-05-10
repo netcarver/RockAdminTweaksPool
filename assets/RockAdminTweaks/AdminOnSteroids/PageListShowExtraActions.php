@@ -4,23 +4,30 @@ namespace RockAdminTweaks;
 
 use ProcessWire\HookEvent;
 
-class PageListShowExtraActions extends Tweak {
-
-    public function info() {
+class PageListShowExtraActions extends Tweak
+{
+    public function info()
+    {
         return [
             'description' => "Shows extra page action items in page tree for SuperUsers",
         ];
     }
 
 
-    public function ready() {
-        if (!$this->wire->user->isSuperuser()) return;
-        if ($this->wire->page->template != 'admin') return;
+    public function ready()
+    {
+        if (!$this->wire->user->isSuperuser()) {
+            return;
+        }
+        if ($this->wire->page->template != 'admin') {
+            return;
+        }
         $this->wire->addHookAfter("Page(template=admin)::render", $this, "addStyle");
     }
 
 
-    public function addStyle(HookEvent $event) {
+    public function addStyle(HookEvent $event)
+    {
         $event->return = str_replace(
             "</body>",
             "<script>

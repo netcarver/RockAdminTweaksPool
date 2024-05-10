@@ -12,16 +12,22 @@ class BypassTrash extends Tweak
     private $strings;
 
 
-    public function info() {
+    public function info()
+    {
         return [
             'description' => "Add buttons/options to bypass trash for SuperUsers",
         ];
     }
 
 
-    public function ready() {
-        if (!$this->wire->user->isSuperuser()) return;
-        if ($this->wire->page->template != 'admin') return;
+    public function ready()
+    {
+        if (!$this->wire->user->isSuperuser()) {
+            return;
+        }
+        if ($this->wire->page->template != 'admin') {
+            return;
+        }
 
         $this->addHookAfter('ProcessPageListActions::getExtraActions', $this, 'addDeleteButton');
         $this->addHookAfter('ProcessPageListActions::processAction', $this, 'addDeleteButtonAction');
@@ -50,7 +56,8 @@ class BypassTrash extends Tweak
     }
 
 
-    public function addStyle(HookEvent $event) {
+    public function addStyle(HookEvent $event)
+    {
         $event->return = str_replace(
             "</head>",
             "<style>
@@ -70,7 +77,6 @@ class BypassTrash extends Tweak
             var str_cancel = $str_cancel
             var str_confirm = $str_confirm
             // Delete + non-superuser Trash actions
-            // $(document).on('mousedown', 'a.PageListActionTrash.aos-pagelist-confirm, .PageTrash.aos-pagelist-confirm', function (e) {
             $(document).on('mousedown', 'a.aos-pagelist-confirm', function (e) {
 
                 e.preventDefault();
@@ -81,7 +87,9 @@ class BypassTrash extends Tweak
                     linkTextDefault;
 
                 if (!link.attr('data-text-original')) {
-                    var currentText = $(this).get(0).childNodes[1] ? $(this).get(0).childNodes[1].nodeValue : $(this).html();
+                    var currentText = $(this).get(0).childNodes[1] ?
+                        $(this).get(0).childNodes[1].nodeValue :
+                        $(this).html();
                     link.attr('data-text-original', currentText);
                     if (link.hasClass('PageListActionDelete') || link.hasClass('PageDelete')) {
                         link.attr('data-text-confirm', str_confirm);
@@ -102,7 +110,9 @@ class BypassTrash extends Tweak
                         return false;
                     }
 
-                    linkTextDefault = link.attr('data-text-confirm') ? link.attr('data-text-confirm') : link.attr('data-text-original');
+                    linkTextDefault = link.attr('data-text-confirm') ?
+                        link.attr('data-text-confirm') :
+                        link.attr('data-text-original');
                     linkCancel = link.clone(true);
                     linkCancel
                         .addClass('cancel')
@@ -118,7 +128,7 @@ class BypassTrash extends Tweak
             });
             </script>
             </body>",
-        $event->return
+            $event->return
         );
     }
 
@@ -164,8 +174,8 @@ class BypassTrash extends Tweak
      *
      * @return bool
      */
-    public function addDeleteButtonAction(HookEvent $event) {
-
+    public function addDeleteButtonAction(HookEvent $event)
+    {
         $page = $event->arguments(0);
         $action = $event->arguments(1);
         // do not allow for pages having children
@@ -188,7 +198,8 @@ class BypassTrash extends Tweak
     }
 
 
-    public function addDeletePermanentlyField(HookEvent $event) {
+    public function addDeletePermanentlyField(HookEvent $event)
+    {
         if ($this->editedPage && !$this->editedPage->trashable()) {
             return false;
         }
@@ -227,7 +238,8 @@ class BypassTrash extends Tweak
 
 
     // delete page instead trashing if delete_permanently was checked
-    public function addDeletePermanentlyHook(HookEvent $event) {
+    public function addDeletePermanentlyHook(HookEvent $event)
+    {
         if (isset($this->wire('input')->post->delete_permanently)) {
             $p = $event->arguments[0];
             $session = $this->wire('session');

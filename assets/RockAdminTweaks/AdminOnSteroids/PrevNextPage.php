@@ -5,20 +5,23 @@ namespace RockAdminTweaks;
 use ProcessWire\HookEvent;
 use ProcessWire\RepeaterPage;
 
-class PrevNextPage extends Tweak {
-
+class PrevNextPage extends Tweak
+{
     private $editedPage;
 
-
-    public function info() {
+    public function info()
+    {
         return [
             'description' => "Add buttons/options to edit prev/next page",
         ];
     }
 
 
-    public function ready() {
-        if ($this->wire->page->template != 'admin') return;
+    public function ready()
+    {
+        if ($this->wire->page->template != 'admin') {
+            return;
+        }
 
         $this->editedPage = false;
         $editedPageId = $this->wire('sanitizer')->int($this->wire('input')->get->id);
@@ -33,7 +36,6 @@ class PrevNextPage extends Tweak {
             && $this->wire('input')->id
             && $this->editedPage
         ) {
-
             // sort precedence: template level - page level - "sort"
             $sortfield = 'sort';
             $parent = $this->editedPage->parent();
@@ -42,14 +44,14 @@ class PrevNextPage extends Tweak {
                 $sortfield = $parent->template->sortfield ?: $parent->sortfield;
             }
 
-            $baseSelector = 'include=all, template!=admin, id!=' . $this->wire('config')->http404PageID . ', parent=' . $parent;
+            $p404_id = $this->wire('config')->http404PageID;
+            $baseSelector = "include=all, template!=admin, id!=$p404_id, parent=$parent";
             $prevnextlinks = array();
             $isFirst = false;
             $isLast = false;
             $numSiblings = $parent->numChildren(true);
 
             if ($numSiblings > 1) {
-
                 $selector = $baseSelector . ', sort=' . $sortfield;
 
                 if (strpos($sortfield, '-') === 0) {
@@ -67,7 +69,7 @@ class PrevNextPage extends Tweak {
                 }
 
                 if (!$prev->id) {
-                    $prev = $this->editedPage->siblings($baseSelector . ', limit=1, sort=' . $sortfieldReversed)->first();
+                    $prev = $this->editedPage->siblings("$baseSelector, limit=1, sort=" . $sortfieldReversed)->first();
                     $isLast = true;
                 }
 
@@ -99,7 +101,8 @@ class PrevNextPage extends Tweak {
     }
 
 
-    public function addStyle(HookEvent $event) {
+    public function addStyle(HookEvent $event)
+    {
         $event->return = str_replace(
             "</head>",
             "<style>
@@ -141,11 +144,17 @@ class PrevNextPage extends Tweak {
                     var icon
                     if (PrevNextLinks.prev) {
                         icon = 'fa fa-angle-left'
-                        targetElement.append('<a href=\"' + PrevNextLinks.prev.url + '\" title=\"' + PrevNextLinks.prev.title + '\" class=\"aos-edit-prev\"><i class=\"' + icon + '\"></i></a>')
+                        targetElement.append(
+                            '<a href=\"' + PrevNextLinks.prev.url + '\" title=\"' + PrevNextLinks.prev.title + '\"' +
+                            ' class=\"aos-edit-prev\"><i class=\"' + icon + '\"></i></a>'
+                        )
                     }
                     if (PrevNextLinks.next) {
                         icon = 'fa fa-angle-right'
-                        targetElement.append('<a href=\"' + PrevNextLinks.next.url + '\" title=\"' + PrevNextLinks.next.title + '\" class=\"aos-edit-next\"><i class=\"' + icon + '\"></i></a>')
+                        targetElement.append(
+                            '<a href=\"' + PrevNextLinks.next.url + '\" title=\"' + PrevNextLinks.next.title + '\"' +
+                            ' class=\"aos-edit-next\"><i class=\"' + icon + '\"></i></a>'
+                        )
                     }
                 }
             }
