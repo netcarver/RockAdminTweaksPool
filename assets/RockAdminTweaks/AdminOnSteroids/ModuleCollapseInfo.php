@@ -5,9 +5,8 @@ namespace RockAdminTweaks;
 use ProcessWire\HookEvent;
 use ProcessWire\Inputfield;
 
-class ModuleCollapseInfo extends Tweak {
-
-
+class ModuleCollapseInfo extends Tweak
+{
     public function info()
     {
         return [
